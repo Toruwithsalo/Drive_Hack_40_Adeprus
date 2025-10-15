@@ -10,7 +10,7 @@ def home():
     return render_template('home.html')
 @app.route('/auth')
 def auth():
-    return render_template('/auth.html')
+    return render_template('auth.html')
 
 
 if __name__ == 'main':
