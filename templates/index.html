@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Образовательный Чат-бот</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Анимированный фон -->
+    <div class="background-animation">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+    </div>
+
+    <div class="chat-container">
+        <!-- Заголовок -->
+        <header class="chat-header">
+            <div class="header-content">
+                <div class="bot-avatar">
+                    <div class="avatar-icon">🎓</div>
+                    <div class="status-indicator"></div>
+                </div>
+                <div class="header-info">
+                    <h1 class="bot-name">Образовательный Ассистент</h1>
+                    <p class="bot-status" id="bot-status">Онлайн • Готов помочь</p>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn" id="theme-toggle" title="Сменить тему">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Окно чата -->
+        <main class="chat-main">
+            <div id="chat-window" class="chat-window">
+                <!-- Приветственное сообщение -->
+                <div class="message bot-message welcome-message">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        <div class="message-text">
+                            <strong>Добро пожаловать!</strong> Я ваш образовательный помощник. 
+                            Готов ответить на вопросы об обучении, специальностях, расписании и многом другом.
+                        </div>
+                        <div class="message-time" id="welcome-time"></div>
+                    </div>
+                </div>
+
+                <!-- Быстрые вопросы -->
+                <div class="quick-questions-section">
+                    <div class="section-title">Частые вопросы</div>
+                    <div class="quick-questions-grid">
+                        <button class="quick-question-btn" data-question="Какие специальности доступны?">
+                            🎯 Специальности
+                        </button>
+                        <button class="quick-question-btn" data-question="Какие льготы для студентов?">
+                            💰 Льготы
+                        </button>
+                        <button class="quick-question-btn" data-question="Расписание на сегодня">
+                            📅 Расписание
+                        </button>
+                        <button class="quick-question-btn" data-question="Как связаться с деканатом?">
+                            📞 Контакты
+                        </button>
+                        <button class="quick-question-btn" data-question="Когда сессия?">
+                            📚 Сессия
+                        </button>
+                        <button class="quick-question-btn" data-question="Как добраться до метро?">
+                            🚇 Метро
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Индикатор набора сообщения -->
+            <div class="typing-indicator" id="typing-indicator">
+                <div class="typing-avatar">🤖</div>
+                <div class="typing-content">
+                    <div class="typing-text">Бот печатает</div>
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Область ввода -->
+        <footer class="chat-footer">
+            <div class="input-container">
+                <div class="input-actions">
+                    <button class="action-btn voice-btn" id="voice-btn" title="Голосовой ввод">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="message-form" class="message-form">
+                    <div class="input-wrapper">
+                        <input type="text" id="message-input" placeholder="Задайте ваш вопрос..." autocomplete="off" maxlength="500">
+                        <div class="input-border"></div>
+                    </div>
+                    <button type="submit" class="send-btn" id="send-btn" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="extra-actions">
+                    <button class="action-btn audio-btn" id="audio-toggle" title="Включить озвучку">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="footer-info">
+                <div class="char-counter" id="char-counter">0/500</div>
+                <div class="ai-info">Powered by GigaChat AI</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Уведомления -->
+    <div class="notification" id="notification"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
