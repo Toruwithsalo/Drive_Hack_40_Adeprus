@@ -18,7 +18,11 @@ P.S. если консоль не может найти команды python и
   pip install -r requirements.txt
 
 Шаг 3:
+Ввести свой Authorization key для Gigachat и Client_id и Client_secret для SaluteSpeech
+
+Шаг 4:
   Запустите локальный сервер и перейдите в браузер по ссылке ниже:
   python main.py
 
   http://localhost:5000
+ 
