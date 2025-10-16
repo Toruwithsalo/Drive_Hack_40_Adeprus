@@ -2,160 +2,185 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Образовательный Чат-бот для Интерактивной Доски</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="autoplay-policy" content="user-gesture-required">
+    <title>Чат-бот</title>
+    <link rel="stylesheet" href="../static/style.css">
 </head>
-<body class="touch-interface">
-    <div class="board-container">
-        <!-- Упрощенный заголовок -->
-        <header class="board-header">
-            <div class="header-main">
-                <div class="board-title">
-                    <h1>🎓 Образовательный Помощник</h1>
-                    <div class="status-indicator online" id="board-status">
-                        <span class="status-dot"></span>
-                        <span>Онлайн</span>
+<body>
+    <div class="app-wrapper">
+        <!-- Левый узор -->
+        <div class="pattern pattern-left"></div>
+
+        <div class="chat-container">
+            <!-- Логотипы -->
+            <div class="top-logos">
+                <img src="../static/img/logo1.svg" alt="Logo 1" class="logo">
+                <img src="../static/img/logo2.svg" alt="Logo 2" class="logo">
+            </div>
+
+            <header class="chat-header">
+                <button id="mascot-btn" class="mascot-button">
+                    <img src="../static/img/mascot.svg" alt="Mascot" class="mascot">
+                    <div class="mascot-notification">!</div>
+                </button>
+                <div class="header-title-container">
+                    <h1 id="header-title">Популярные вопросы</h1>
+                    <div id="welcome-time" class="welcome-time"></div>
+                </div>
+                <div id="board-status" class="board-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Проверка...</span>
+                </div>
+            </header>
+
+            <main id="chat-window" class="chat-box">
+                <div class="welcome-board">
+                    <div class="faq-section">
+                        <button class="question-btn" data-question="Специальности/профессии">Специальности/профессии</button>
+                        <button class="question-btn" data-question="Льготы для обучающихся">Льготы для обучающихся</button>
+                        <button class="question-btn" data-question="Педагогический состав">Педагогический состав</button>
+                        <button class="question-btn" data-question="Учебный план">Учебный план</button>
+                        <button class="question-btn" data-question="Когда проходят сессии">Когда проходят сессии</button>
+                        <button class="question-btn" data-question="Как пройти к декану">Как пройти к декану</button>
+                        <button class="question-btn" data-question="Режим работы декана">Режим работы декана</button>
+                        <button class="question-btn" data-question="Расписание на сегодня">Расписание на сегодня</button>
+                        <button class="question-btn" data-question="Как добраться до метро">Как добраться до метро</button>
                     </div>
                 </div>
-                <div class="board-controls">
-                    <button class="control-btn large-btn" id="clear-chat" title="Очистить чат">
-                        🗑️
+                <!-- Сообщения будут добавляться здесь -->
+            </main>
+
+            <!-- Индикатор набора -->
+            <div id="typing-indicator" class="typing-indicator">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span>Бот печатает...</span>
+            </div>
+
+            <footer class="input-area">
+                <div class="voice-controls">
+                    <button id="voice-btn" class="mic-button">
+                        <svg class="mic-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
+                            <path class="mic-icon-path" d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/>
+                        </svg>
                     </button>
-                    <button class="control-btn large-btn" id="theme-toggle" title="Сменить тему">
+                    
+                    <div class="voice-settings">
+                        <label class="voice-option">
+                            <input type="radio" id="voice-female" name="voice" value="female" checked>
+                            <span>Женский</span>
+                        </label>
+                        <label class="voice-option">
+                            <input type="radio" id="voice-male" name="voice" value="male">
+                            <span>Мужской</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="text-input-container">
+                    <input type="text" id="message-input" placeholder="Спросите что-нибудь...">
+                    <div class="input-controls">
+                        <span id="char-counter" class="char-counter">0/200</span>
+                        <button id="send-btn" class="send-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="additional-controls">
+                    <label class="audio-toggle">
+                        <input type="checkbox" id="audio-toggle" checked>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Озвучка</span>
+                    </label>
+                    
+                    <button id="clear-chat" class="control-btn" title="Очистить чат">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                    
+                    <button id="theme-toggle" class="control-btn" title="Сменить тему">
                         🌙
                     </button>
                 </div>
+            </footer>
+        </div>
+
+        <!-- Правый узор -->
+        <div class="pattern pattern-right"></div>
+    </div>
+
+    <!-- Оверлей для записи голоса -->
+    <div id="recording-overlay" class="recording-overlay">
+        <div class="recording-content">
+            <div class="recording-animation"></div>
+            <p>Говорите сейчас...</p>
+        </div>
+    </div>
+
+    <!-- Модальное окно маскота -->
+    <div id="mascot-modal" class="mascot-modal">
+        <div class="mascot-modal-content">
+            <div class="mascot-modal-header">
+                <h2>🐻 Московский метрополитен</h2>
+                <button id="close-mascot-modal" class="close-mascot-modal">×</button>
             </div>
-        </header>
-
-        <!-- Основная область -->
-        <main class="board-main">
-            <!-- Боковая панель с быстрыми вопросами -->
-            <aside class="questions-sidebar">
-                <h3>📋 Быстрые вопросы</h3>
-                <div class="questions-grid">
-                    <button class="question-btn large-touch-btn" data-question="Какие специальности доступны?">
-                        🎯 Специальности
-                    </button>
-                    <button class="question-btn large-touch-btn" data-question="Какие льготы для студентов?">
-                        💰 Льготы
-                    </button>
-                    <button class="question-btn large-touch-btn" data-question="Расписание на сегодня">
-                        📅 Расписание
-                    </button>
-                    <button class="question-btn large-touch-btn" data-question="Когда сессия?">
-                        📚 Сессия
-                    </button>
-                    <button class="question-btn large-touch-btn" data-question="Как связаться с деканатом?">
-                        📞 Контакты
-                    </button>
-                    <button class="question-btn large-touch-btn" data-question="Расскажи про метро">
-                        🚇 Метро
-                    </button>
-                    <button class="question-btn large-touch-btn" data-question="Педагогический состав">
-                        👨‍🏫 Преподаватели
-                    </button>
-                    <button class="question-btn large-touch-btn" data-question="Учебный план">
-                        📖 Учебный план
-                    </button>
-                </div>
-                
-                <!-- Панель выбора голоса -->
-                <div class="voice-selection-panel">
-                    <h4>🎵 Выбор голоса</h4>
-                    <div class="voice-options">
-                        <div class="voice-option">
-                            <input type="radio" id="voice-female" name="voice" value="female" checked>
-                            <label for="voice-female" class="voice-label">
-                                <span class="voice-icon">👩</span>
-                                <span class="voice-name">Женский</span>
-                            </label>
-                        </div>
-                        <div class="voice-option">
-                            <input type="radio" id="voice-male" name="voice" value="male">
-                            <label for="voice-male" class="voice-label">
-                                <span class="voice-icon">👨</span>
-                                <span class="voice-name">Мужской</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Область чата -->
-            <section class="chat-area">
-                <div id="chat-window" class="chat-window-touch">
-                    <!-- Приветственное сообщение -->
-                    <div class="welcome-board">
-                        <div class="welcome-icon">🤖</div>
-                        <div class="welcome-text">
-                            <h2>Добро пожаловать!</h2>
-                            <p>Я ваш образовательный помощник. Задавайте вопросы или используйте быстрые кнопки слева.</p>
-                            <div class="welcome-time" id="welcome-time"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Упрощенная панель ввода -->
-                <div class="input-panel-touch">
-                    <div class="input-main">
-                        <button class="voice-btn-touch large-touch-btn" id="voice-btn" title="Голосовой ввод">
-                            <span class="voice-icon">🎤</span>
-                            <span class="voice-text">Голос</span>
-                        </button>
-                        
-                        <div class="input-field-container">
-                            <input type="text" 
-                                   id="message-input" 
-                                   placeholder="Введите ваш вопрос..." 
-                                   class="large-input">
-                            <div class="input-actions">
-                                <button type="submit" class="send-btn-touch" id="send-btn" disabled>
-                                    📤
-                                </button>
-                            </div>
+            <div class="mascot-modal-body">
+                <div class="metro-info">
+                    <div class="metro-fact">
+                        <h3>🚇 Самая красивая подземка в мире</h3>
+                        <p>Московское метро известно своими дворцами-станциями с мраморными колоннами, мозаиками и уникальной архитектурой.</p>
+                        <div class="metro-image-placeholder">
+                            <img src="../static/img/komsomol.jpeg" alt="Метро Комсомольская" class="image-caption">
                         </div>
                     </div>
                     
-                    <div class="audio-controls">
-                        <label class="audio-toggle">
-                            <input type="checkbox" id="audio-toggle" checked>
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-text">Озвучка</span>
-                        </label>
-                        <div class="char-counter-large" id="char-counter">0/200</div>
+                    <div class="metro-fact">
+                        <h3>📅 История</h3>
+                        <p>Первая линия открылась 15 мая 1935 года. Сегодня это одна из самых загруженных систем метро в мире.</p>
+                        <div class="metro-image-placeholder">
+                            <img src="../static/img/firstsostav.jpeg" alt="Первый Вагон" class="image-caption">
+                        </div>
+                    </div>
+                    
+                    <div class="metro-fact">
+                        <h3>🔢 Цифры и факты</h3>
+                        <ul>
+                            <li>Более 250 станций</li>
+                            <li>Протяженность более 450 км</li>
+                            <li>Ежедневный пассажиропоток - 9 миллионов человек</li>
+                            <li>Самые глубокие станции - до 84 метров</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="metro-fact">
+                        <h3>🎨 Архитектурные стили</h3>
+                        <p>От сталинского ампира до современных хай-тек решений. Каждая эпоха оставила свой след в облике станций.</p>
+                        <div class="metro-image-placeholder">
+                            <img src="../static/img/komsomol.jpeg" alt="Метро Комсомольская" class="image-caption">
+                        </div>
                     </div>
                 </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- Крупные уведомления для доски -->
-    <div class="board-notification" id="notification"></div>
-
-    <!-- Индикатор записи -->
-    <div class="recording-overlay" id="recording-overlay">
-        <div class="recording-content">
-            <div class="pulsing-mic">🎤</div>
-            <h3>Говорите сейчас...</h3>
-            <p>Идет запись голоса</p>
-        </div>
-    </div>
-
-    <!-- Индикатор загрузки -->
-    <div class="loading-overlay" id="typing-indicator">
-        <div class="loading-content">
-            <div class="loading-dots">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
             </div>
-            <p>Обрабатываю запрос...</p>
+            <div class="mascot-modal-footer">
+                <button id="mascot-close-btn" class="mascot-action-btn">Закрыть</button>
+            </div>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Уведомления -->
+    <div id="notification" class="board-notification"></div>
+
+    <script src="../static/script.js"></script>
 </body>
 </html>
