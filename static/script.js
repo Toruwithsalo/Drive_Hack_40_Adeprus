@@ -7,8 +7,10 @@ class BoardChatApp {
         this.currentAudio = null;
         this.isRecording = false;
         this.recognition = null;
+        this.selectedVoice = 'female';
         this.speechSupport = this.checkSpeechSupport();
         this.setupSpeechRecognition();
+        this.lastAudioUrl = null;
     }
 
     initializeElements() {
@@ -29,13 +31,15 @@ class BoardChatApp {
         this.themeToggle = document.getElementById('theme-toggle');
         this.clearChatBtn = document.getElementById('clear-chat');
         
-        // Форма
-        this.messageForm = this.messageInput.closest('.input-field-container');
+        // Элементы выбора голоса
+        this.voiceFemale = document.getElementById('voice-female');
+        this.voiceMale = document.getElementById('voice-male');
     }
 
     initializeApp() {
         this.setWelcomeTime();
         this.loadTheme();
+        this.loadVoicePreference();
         this.setupQuickQuestions();
         this.checkHealth();
         this.setupBoardSpecificFeatures();
@@ -87,6 +91,10 @@ class BoardChatApp {
         // Переключение озвучки
         this.audioToggle.addEventListener('change', () => this.toggleAudio());
 
+        // Выбор голоса
+        this.voiceFemale.addEventListener('change', () => this.handleVoiceChange('female'));
+        this.voiceMale.addEventListener('change', () => this.handleVoiceChange('male'));
+
         // Быстрые вопросы
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('question-btn')) {
@@ -96,6 +104,28 @@ class BoardChatApp {
 
         // Закрытие уведомлений по клику
         this.notification.addEventListener('click', () => this.hideNotification());
+    }
+
+    handleVoiceChange(voiceType) {
+        this.selectedVoice = voiceType;
+        localStorage.setItem('preferredVoice', voiceType);
+        
+        const voiceName = voiceType === 'female' ? 'женский' : 'мужской';
+        this.showNotification(`Выбран ${voiceName} голос`, 'success');
+    }
+
+    loadVoicePreference() {
+        const savedVoice = localStorage.getItem('preferredVoice');
+        if (savedVoice) {
+            this.selectedVoice = savedVoice;
+            
+            // Устанавливаем соответствующий radio button
+            if (savedVoice === 'female') {
+                this.voiceFemale.checked = true;
+            } else {
+                this.voiceMale.checked = true;
+            }
+        }
     }
 
     setupQuickQuestions() {
@@ -153,25 +183,33 @@ class BoardChatApp {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ query: message })
+                body: JSON.stringify({ 
+                    query: message,
+                    voice: this.selectedVoice
+                })
             });
 
             if (!response.ok) {
-                throw new Error(`Ошибка сервера: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `Ошибка сервера: ${response.status}`);
             }
 
             const data = await response.json();
             this.hideTypingIndicator();
             
-            this.displayMessage(data.textResponse, 'bot');
-            
-            if (this.audioEnabled && data.audioUrl) {
-                this.playAudio(data.audioUrl);
+            if (data.textResponse) {
+                this.displayMessage(data.textResponse, 'bot');
+                
+                if (this.audioEnabled && data.audioUrl) {
+                    this.playAudio(data.audioUrl);
+                }
+            } else {
+                throw new Error('Некорректный ответ от сервера');
             }
 
         } catch (error) {
             this.hideTypingIndicator();
-            this.displayMessage('Извините, произошла ошибка. Попробуйте еще раз.', 'bot');
+            this.displayMessage('Извините, произошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте еще раз.', 'bot');
             this.showNotification(error.message, 'error');
             console.error('Ошибка:', error);
         }
@@ -264,8 +302,10 @@ class BoardChatApp {
         try {
             if (this.currentAudio) {
                 this.currentAudio.pause();
+                this.currentAudio = null;
             }
             
+            this.lastAudioUrl = audioUrl;
             const urlWithTimestamp = `${audioUrl}?t=${Date.now()}`;
             this.currentAudio = new Audio(urlWithTimestamp);
             
@@ -275,8 +315,15 @@ class BoardChatApp {
                 this.currentAudio = null;
             };
             
+            this.currentAudio.onerror = (e) => {
+                console.error('Ошибка воспроизведения аудио:', e);
+                this.showNotification('Ошибка воспроизведения аудио', 'error');
+                this.currentAudio = null;
+            };
+            
         } catch (error) {
             console.error('Ошибка воспроизведения аудио:', error);
+            this.showNotification('Ошибка воспроизведения аудио', 'error');
         }
     }
 
@@ -307,6 +354,8 @@ class BoardChatApp {
             const response = await fetch('/api/health');
             if (!response.ok) throw new Error('Сервер недоступен');
             
+            const data = await response.json();
+            
             this.boardStatus.classList.add('online');
             this.boardStatus.querySelector('span:last-child').textContent = 'Онлайн';
         } catch (error) {
@@ -315,7 +364,7 @@ class BoardChatApp {
         }
     }
 
-    // Базовые функции голосового ввода (можно расширить)
+    // Базовые функции голосового ввода
     checkSpeechSupport() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         return {
@@ -348,6 +397,7 @@ class BoardChatApp {
             this.isRecording = true;
             this.voiceBtn.classList.add('recording');
             this.recordingOverlay.classList.add('show');
+            this.showNotification('Говорите сейчас...', 'info');
         };
 
         this.recognition.onresult = (event) => {
@@ -366,7 +416,21 @@ class BoardChatApp {
 
         this.recognition.onerror = (event) => {
             console.error('Speech recognition error:', event.error);
-            this.showNotification('Ошибка распознавания речи', 'error');
+            
+            let errorMessage = 'Ошибка распознавания речи';
+            switch (event.error) {
+                case 'no-speech':
+                    errorMessage = 'Речь не распознана. Попробуйте еще раз.';
+                    break;
+                case 'audio-capture':
+                    errorMessage = 'Микрофон не доступен. Проверьте разрешения.';
+                    break;
+                case 'not-allowed':
+                    errorMessage = 'Доступ к микрофону запрещен. Разрешите доступ в настройках браузера.';
+                    break;
+            }
+            
+            this.showNotification(errorMessage, 'error');
         };
     }
 
