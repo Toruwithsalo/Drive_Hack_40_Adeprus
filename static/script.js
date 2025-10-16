@@ -1,4 +1,3 @@
-// script.js - ИСПРАВЛЕННАЯ ВЕРСИЯ
 class BoardChatApp {
     constructor() {
         this.initializeElements();
@@ -19,6 +18,10 @@ class BoardChatApp {
         this.mascotActive = false;
         this.userInteracted = false;
         this.chatStarted = false;
+        
+        // Переменные для управления аудио
+        this.audioQueue = [];
+        this.isPlayingAudio = false;
     }
 
     initializeElements() {
@@ -239,27 +242,40 @@ class BoardChatApp {
     }
 
     async playMetroAudio() {
+        if (!this.audioEnabled) {
+            return;
+        }
+
         try {
-            // Создаем запрос к бэкенду для генерации аудио о метро
+            this.showNotification('Генерируем аудио о метро...', 'info');
+            
             const response = await fetch('/api/chat/text', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 
-                    query: "Расскажи интересные факты о Московском метрополитене, его истории, архитектуре и современных возможностях",
+                    query: "Расскажи интересные факты о Московском метрополитене, его истории, архитектуре и современных возможностях. Расскажи кратко, но информативно.",
                     voice: this.selectedVoice
                 })
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                if (data.audioUrl && this.audioEnabled) {
-                    await this.playAudio(data.audioUrl);
-                }
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
             }
+
+            const data = await response.json();
+            
+            if (data.audioUrl) {
+                await this.playAudio(data.audioUrl);
+                this.showNotification('Аудио о метро воспроизведено', 'success');
+            } else {
+                throw new Error('Аудио URL не получен от сервера');
+            }
+
         } catch (error) {
             console.error('Ошибка воспроизведения аудио о метро:', error);
+            this.showNotification('Не удалось воспроизвести аудио о метро', 'error');
         }
     }
 
@@ -275,7 +291,6 @@ class BoardChatApp {
         clearTimeout(this.inactivityTimer);
     }
 
-    // Остальные методы остаются без изменений
     setWelcomeTime() {
         const now = new Date();
         const timeString = now.toLocaleTimeString('ru-RU', { 
@@ -291,12 +306,15 @@ class BoardChatApp {
     }
 
     setupSystemThemeListener() {
+        // Проверка системных предпочтений темы
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            // Если системная тема темная и нет сохраненной темы
             if (!localStorage.getItem('theme')) {
                 this.applyTheme('dark');
             }
         }
 
+        // Слушатель изменений системной темы
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
             if (!localStorage.getItem('theme')) {
                 this.applyTheme(e.matches ? 'dark' : 'light');
@@ -323,12 +341,17 @@ class BoardChatApp {
         if (savedVoice) {
             this.selectedVoice = savedVoice;
             
+            // Устанавливаем соответствующий radio button
             if (savedVoice === 'female') {
                 this.voiceFemale.checked = true;
             } else {
                 this.voiceMale.checked = true;
             }
         }
+    }
+
+    setupQuickQuestions() {
+        // Автоматическая настройка уже работает через делегирование событий
     }
 
     handleSubmit() {
@@ -358,6 +381,7 @@ class BoardChatApp {
         const question = button.getAttribute('data-question');
         this.sendMessage(question);
         
+        // Анимация нажатия
         button.style.transform = 'scale(0.95)';
         setTimeout(() => {
             button.style.transform = '';
@@ -365,14 +389,19 @@ class BoardChatApp {
     }
 
     async sendMessage(message) {
+        // Очищаем поле ввода
         this.messageInput.value = '';
         this.handleInput();
         
+        // Начинаем чат, если еще не начат
         if (!this.chatStarted) {
             this.startChat();
         }
         
+        // Показываем сообщение пользователя
         this.displayMessage(message, 'user');
+        
+        // Показываем индикатор загрузки
         this.showTypingIndicator();
         
         try {
@@ -396,10 +425,12 @@ class BoardChatApp {
             this.hideTypingIndicator();
             
             if (data.textResponse) {
-                this.displayMessage(data.textResponse, 'bot');
+                // Передаем audioUrl в displayMessage
+                this.displayMessage(data.textResponse, 'bot', data.audioUrl);
                 
+                // Воспроизводим аудио если включено
                 if (this.audioEnabled && data.audioUrl) {
-                    this.playAudio(data.audioUrl);
+                    await this.playAudio(data.audioUrl);
                 }
             } else {
                 throw new Error('Некорректный ответ от сервера');
@@ -413,14 +444,35 @@ class BoardChatApp {
         }
     }
 
-    displayMessage(text, sender) {
+    displayMessage(text, sender, audioUrl = null) {
         const messageElement = document.createElement('div');
         messageElement.className = `message-touch ${sender}-message-touch`;
+        
+        if (audioUrl && sender === 'bot') {
+            messageElement.classList.add('message-with-audio');
+        }
         
         const time = new Date().toLocaleTimeString('ru-RU', { 
             hour: '2-digit', 
             minute: '2-digit' 
         });
+
+        let audioIndicator = '';
+        if (audioUrl && sender === 'bot') {
+            audioIndicator = `
+                <div class="audio-playing-indicator" data-audio-url="${audioUrl}">
+                    <span>🔊</span>
+                    <div class="audio-wave">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <button class="replay-audio-btn" title="Воспроизвести снова">↻</button>
+                </div>
+            `;
+        }
 
         messageElement.innerHTML = `
             <div class="message-avatar-touch">
@@ -428,12 +480,26 @@ class BoardChatApp {
             </div>
             <div class="message-content-touch">
                 <div class="message-text-touch">${this.escapeHtml(text)}</div>
-                <div class="message-time-touch">${time}</div>
+                <div class="message-time-touch">
+                    ${time}
+                    ${audioIndicator}
+                </div>
             </div>
         `;
 
         this.chatWindow.appendChild(messageElement);
         this.scrollToBottom();
+        
+        // Добавляем обработчик для кнопки повторного воспроизведения
+        if (audioUrl && sender === 'bot') {
+            const replayBtn = messageElement.querySelector('.replay-audio-btn');
+            replayBtn.addEventListener('click', () => {
+                this.playAudio(audioUrl).catch(error => {
+                    console.error('Ошибка повторного воспроизведения:', error);
+                    this.showNotification('Ошибка воспроизведения аудио', 'error');
+                });
+            });
+        }
     }
 
     showTypingIndicator() {
@@ -448,6 +514,7 @@ class BoardChatApp {
         const messages = this.chatWindow.querySelectorAll('.message-touch');
         messages.forEach(msg => msg.remove());
         
+        // Показываем приветственный блок снова
         const welcomeBoard = this.chatWindow.querySelector('.welcome-board');
         if (welcomeBoard) {
             welcomeBoard.style.display = 'block';
@@ -473,14 +540,18 @@ class BoardChatApp {
 
     toggleAudio() {
         this.audioEnabled = this.audioToggle.checked;
+        
+        // Если выключаем аудио, останавливаем текущее воспроизведение
+        if (!this.audioEnabled && this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio = null;
+            this.isPlayingAudio = false;
+        }
+        
         if (this.audioEnabled) {
             this.showNotification('Озвучка включена', 'success');
         } else {
             this.showNotification('Озвучка выключена', 'info');
-            if (this.currentAudio) {
-                this.currentAudio.pause();
-                this.currentAudio = null;
-            }
         }
     }
 
@@ -490,32 +561,71 @@ class BoardChatApp {
     }
 
     async playAudio(audioUrl) {
-        try {
-            if (this.currentAudio) {
-                this.currentAudio.pause();
-                this.currentAudio = null;
+        return new Promise((resolve, reject) => {
+            // Если озвучка выключена, сразу завершаем
+            if (!this.audioEnabled) {
+                resolve();
+                return;
             }
-            
-            this.lastAudioUrl = audioUrl;
-            const urlWithTimestamp = `${audioUrl}?t=${Date.now()}`;
-            this.currentAudio = new Audio(urlWithTimestamp);
-            
-            await this.currentAudio.play();
-            
-            this.currentAudio.onended = () => {
+
+            try {
+                // Останавливаем текущее воспроизведение
+                if (this.currentAudio) {
+                    this.currentAudio.pause();
+                    this.currentAudio = null;
+                }
+
+                // Создаем полный URL для аудио
+                const fullAudioUrl = audioUrl.startsWith('http') ? audioUrl : `${window.location.origin}${audioUrl}`;
+                const urlWithTimestamp = `${fullAudioUrl}?t=${Date.now()}`;
+                
+                console.log('Воспроизведение аудио:', urlWithTimestamp);
+                
+                this.currentAudio = new Audio(urlWithTimestamp);
+                this.isPlayingAudio = true;
+
+                // Обработчики событий
+                this.currentAudio.onended = () => {
+                    console.log('Аудио воспроизведение завершено');
+                    this.currentAudio = null;
+                    this.isPlayingAudio = false;
+                    resolve();
+                };
+
+                this.currentAudio.onerror = (e) => {
+                    console.error('Ошибка воспроизведения аудио:', e);
+                    this.currentAudio = null;
+                    this.isPlayingAudio = false;
+                    reject(new Error('Ошибка воспроизведения аудио'));
+                };
+
+                this.currentAudio.oncanplaythrough = () => {
+                    console.log('Аудио готово к воспроизведению');
+                };
+
+                this.currentAudio.onloadstart = () => {
+                    console.log('Началась загрузка аудио');
+                };
+
+                // Запускаем воспроизведение
+                this.currentAudio.play().catch(error => {
+                    console.error('Ошибка при запуске аудио:', error);
+                    this.currentAudio = null;
+                    this.isPlayingAudio = false;
+                    
+                    if (error.name === 'NotAllowedError') {
+                        this.showNotification('Разрешите автоматическое воспроизведение аудио в браузере', 'error');
+                    }
+                    reject(error);
+                });
+
+            } catch (error) {
+                console.error('Ошибка создания аудио:', error);
                 this.currentAudio = null;
-            };
-            
-            this.currentAudio.onerror = (e) => {
-                console.error('Ошибка воспроизведения аудио:', e);
-                this.showNotification('Ошибка воспроизведения аудио', 'error');
-                this.currentAudio = null;
-            };
-            
-        } catch (error) {
-            console.error('Ошибка воспроизведения аудио:', error);
-            this.showNotification('Ошибка воспроизведения аудио', 'error');
-        }
+                this.isPlayingAudio = false;
+                reject(error);
+            }
+        });
     }
 
     scrollToBottom() {
@@ -555,6 +665,7 @@ class BoardChatApp {
         }
     }
 
+    // Базовые функции голосового ввода
     checkSpeechSupport() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         return {
