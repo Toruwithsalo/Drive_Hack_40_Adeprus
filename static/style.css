@@ -105,6 +105,14 @@ body.touch-interface {
     animation: pulse 2s infinite;
 }
 
+.status-indicator.online .status-dot {
+    background: var(--success-color);
+}
+
+.status-indicator:not(.online) .status-dot {
+    background: var(--error-color);
+}
+
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -190,6 +198,81 @@ body.touch-interface {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
     border-color: var(--primary-color);
+}
+
+/* Панель выбора голоса */
+.voice-selection-panel {
+    margin-top: 30px;
+    padding: 25px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    border: 3px solid var(--border-color);
+}
+
+.voice-selection-panel h4 {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.voice-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.voice-option {
+    position: relative;
+}
+
+.voice-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.voice-label {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: var(--bg-primary);
+    border: 3px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 1.4rem;
+    color: var(--text-primary);
+}
+
+.voice-label:hover {
+    background: var(--bg-tertiary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.voice-option input[type="radio"]:checked + .voice-label {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.voice-icon {
+    font-size: 1.8rem;
+    width: 40px;
+    text-align: center;
+}
+
+.voice-name {
+    font-weight: 500;
 }
 
 /* Область чата */
@@ -627,6 +710,10 @@ body.touch-interface {
     .question-btn {
         min-width: 250px;
         flex-shrink: 0;
+    }
+    
+    .voice-selection-panel {
+        display: none;
     }
 }
 
