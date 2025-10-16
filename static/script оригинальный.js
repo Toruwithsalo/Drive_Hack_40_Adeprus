@@ -1,4 +1,3 @@
-// script.js
 class BoardChatApp {
     constructor() {
         this.initializeElements();
@@ -12,11 +11,10 @@ class BoardChatApp {
         this.speechSupport = this.checkSpeechSupport();
         this.setupSpeechRecognition();
         this.lastAudioUrl = null;
-        this.chatStarted = false;
     }
 
     initializeElements() {
-        // Основные элементы
+        // Основные элементы доски
         this.chatWindow = document.getElementById('chat-window');
         this.messageInput = document.getElementById('message-input');
         this.sendBtn = document.getElementById('send-btn');
@@ -26,7 +24,6 @@ class BoardChatApp {
         this.charCounter = document.getElementById('char-counter');
         this.recordingOverlay = document.getElementById('recording-overlay');
         this.welcomeTime = document.getElementById('welcome-time');
-        this.headerTitle = document.getElementById('header-title');
         
         // Кнопки управления
         this.voiceBtn = document.getElementById('voice-btn');
@@ -174,11 +171,6 @@ class BoardChatApp {
         this.messageInput.value = '';
         this.handleInput();
         
-        // Начинаем чат, если еще не начат
-        if (!this.chatStarted) {
-            this.startChat();
-        }
-        
         // Показываем сообщение пользователя
         this.displayMessage(message, 'user');
         
@@ -223,16 +215,13 @@ class BoardChatApp {
         }
     }
 
-    startChat() {
-        this.chatStarted = true;
-        const welcomeBoard = this.chatWindow.querySelector('.welcome-board');
-        if (welcomeBoard) {
-            welcomeBoard.style.display = 'none';
-        }
-        this.headerTitle.textContent = 'Чат-помощник';
-    }
-
     displayMessage(text, sender) {
+        // Убираем приветственный блок при первом сообщении
+        const welcomeBlock = this.chatWindow.querySelector('.welcome-board');
+        if (welcomeBlock) {
+            welcomeBlock.style.display = 'none';
+        }
+
         const messageElement = document.createElement('div');
         messageElement.className = `message-touch ${sender}-message-touch`;
         
@@ -268,13 +257,11 @@ class BoardChatApp {
         messages.forEach(msg => msg.remove());
         
         // Показываем приветственный блок снова
-        const welcomeBoard = this.chatWindow.querySelector('.welcome-board');
-        if (welcomeBoard) {
-            welcomeBoard.style.display = 'block';
+        const welcomeBlock = this.chatWindow.querySelector('.welcome-board');
+        if (welcomeBlock) {
+            welcomeBlock.style.display = 'block';
         }
         
-        this.chatStarted = false;
-        this.headerTitle.textContent = 'Популярные вопросы';
         this.showNotification('Чат очищен', 'success');
     }
 
