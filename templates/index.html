@@ -1,4 +1,4 @@
-<!-- index.html -->
+<!-- index.html - ОБНОВЛЕННЫЙ С МАСКОТОМ -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -20,7 +20,10 @@
             </div>
 
             <header class="chat-header">
-                <img src="../static/img/mascot.svg" alt="Mascot" class="mascot">
+                <button id="mascot-btn" class="mascot-button">
+                    <img src="../static/img/mascot.svg" alt="Mascot" class="mascot">
+                    <div class="mascot-notification">!</div>
+                </button>
                 <div class="header-title-container">
                     <h1 id="header-title">Популярные вопросы</h1>
                     <div id="welcome-time" class="welcome-time"></div>
@@ -122,6 +125,56 @@
         <div class="recording-content">
             <div class="recording-animation"></div>
             <p>Говорите сейчас...</p>
+        </div>
+    </div>
+
+    <!-- Модальное окно маскота -->
+    <div id="mascot-modal" class="mascot-modal">
+        <div class="mascot-modal-content">
+            <div class="mascot-modal-header">
+                <h2>🐻 Московский метрополитен</h2>
+                <button id="close-mascot-modal" class="close-mascot-modal">×</button>
+            </div>
+            <div class="mascot-modal-body">
+                <div class="metro-info">
+                    <div class="metro-fact">
+                        <h3>🚇 Самая красивая подземка в мире</h3>
+                        <p>Московское метро известно своими дворцами-станциями с мраморными колоннами, мозаиками и уникальной архитектурой.</p>
+                        <div class="metro-image-placeholder">
+                            <img src="../static/img/komsomol.jpeg" alt="Метро Комсомольская">
+                        </div>
+                    </div>
+                    
+                    <div class="metro-fact">
+                        <h3>📅 История</h3>
+                        <p>Первая линия открылась 15 мая 1935 года. Сегодня это одна из самых загруженных систем метро в мире.</p>
+                        <div class="metro-image-placeholder">
+                            <div class="image-caption">Первый поезд метро</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metro-fact">
+                        <h3>🔢 Цифры и факты</h3>
+                        <ul>
+                            <li>Более 250 станций</li>
+                            <li>Протяженность более 450 км</li>
+                            <li>Ежедневный пассажиропоток - 9 миллионов человек</li>
+                            <li>Самые глубокие станции - до 84 метров</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="metro-fact">
+                        <h3>🎨 Архитектурные стили</h3>
+                        <p>От сталинского ампира до современных хай-тек решений. Каждая эпоха оставила свой след в облике станций.</p>
+                        <div class="metro-image-placeholder">
+                            <div class="image-caption">Разнообразие архитектурных стилей</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mascot-modal-footer">
+                <button id="mascot-close-btn" class="mascot-action-btn">Закрыть</button>
+            </div>
         </div>
     </div>
 

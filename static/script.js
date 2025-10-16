@@ -1,4 +1,4 @@
-// script.js
+// script.js - ИСПРАВЛЕННАЯ ВЕРСИЯ
 class BoardChatApp {
     constructor() {
         this.initializeElements();
@@ -12,6 +12,12 @@ class BoardChatApp {
         this.speechSupport = this.checkSpeechSupport();
         this.setupSpeechRecognition();
         this.lastAudioUrl = null;
+        
+        // Переменные для маскота
+        this.inactivityTimer = null;
+        this.inactivityDelay = 30000; // 30 секунд бездействия
+        this.mascotActive = false;
+        this.userInteracted = false;
         this.chatStarted = false;
     }
 
@@ -37,6 +43,13 @@ class BoardChatApp {
         // Элементы выбора голоса
         this.voiceFemale = document.getElementById('voice-female');
         this.voiceMale = document.getElementById('voice-male');
+        
+        // Элементы маскота
+        this.mascotBtn = document.getElementById('mascot-btn');
+        this.mascotNotification = this.mascotBtn.querySelector('.mascot-notification');
+        this.mascotModal = document.getElementById('mascot-modal');
+        this.closeMascotModal = document.getElementById('close-mascot-modal');
+        this.mascotCloseBtn = document.getElementById('mascot-close-btn');
     }
 
     initializeApp() {
@@ -46,6 +59,7 @@ class BoardChatApp {
         this.setupQuickQuestions();
         this.checkHealth();
         this.setupBoardSpecificFeatures();
+        this.startInactivityTimer();
     }
 
     setupBoardSpecificFeatures() {
@@ -56,15 +70,6 @@ class BoardChatApp {
         
         // Периодическая проверка состояния
         setInterval(() => this.checkHealth(), 30000);
-    }
-
-    setWelcomeTime() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('ru-RU', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        this.welcomeTime.textContent = `Сегодня ${timeString}`;
     }
 
     setupEventListeners() {
@@ -107,6 +112,202 @@ class BoardChatApp {
 
         // Закрытие уведомлений по клику
         this.notification.addEventListener('click', () => this.hideNotification());
+
+        // Обработка системной темы
+        this.setupSystemThemeListener();
+
+        // Обработчики для маскота
+        this.mascotBtn.addEventListener('click', () => this.handleMascotClick());
+        this.closeMascotModal.addEventListener('click', () => this.hideMascotModal());
+        this.mascotCloseBtn.addEventListener('click', () => this.hideMascotModal());
+        this.mascotModal.addEventListener('click', (e) => {
+            if (e.target === this.mascotModal) {
+                this.hideMascotModal();
+            }
+        });
+
+        // Сброс таймера бездействия при взаимодействии
+        this.setupActivityListeners();
+    }
+
+    setupActivityListeners() {
+        const activityEvents = [
+            'mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'
+        ];
+
+        activityEvents.forEach(event => {
+            document.addEventListener(event, () => {
+                this.resetInactivityTimer();
+            }, { passive: true });
+        });
+    }
+
+    startInactivityTimer() {
+        this.inactivityTimer = setTimeout(() => {
+            if (!this.chatStarted && !this.mascotActive) {
+                this.showMascotAttention();
+            }
+        }, this.inactivityDelay);
+    }
+
+    resetInactivityTimer() {
+        clearTimeout(this.inactivityTimer);
+        this.startInactivityTimer();
+    }
+
+    showMascotAttention() {
+        if (this.chatStarted || this.mascotActive) return;
+
+        this.mascotActive = true;
+        this.mascotBtn.classList.add('attention');
+        this.mascotNotification.classList.add('show');
+        
+        // Показываем уведомление
+        this.showNotification('Маскот хочет вам что-то рассказать! Нажмите на него.', 'info');
+        
+        // Автоматическое скрытие через 15 секунд, если не нажали
+        setTimeout(() => {
+            if (this.mascotActive && !this.mascotModal.classList.contains('show')) {
+                this.hideMascotAttention();
+            }
+        }, 15000);
+    }
+
+    hideMascotAttention() {
+        this.mascotActive = false;
+        this.mascotBtn.classList.remove('attention');
+        this.mascotNotification.classList.remove('show');
+    }
+
+    handleMascotClick() {
+        if (this.mascotActive || this.mascotNotification.classList.contains('show')) {
+            this.showMascotModal();
+            this.hideMascotAttention();
+        } else {
+            // Обычный клик по маскоту - небольшая анимация
+            this.mascotBtn.classList.add('idle');
+            setTimeout(() => {
+                this.mascotBtn.classList.remove('idle');
+            }, 1000);
+        }
+    }
+
+    showMascotModal() {
+        this.mascotModal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        
+        // Добавляем сообщение в чат о метро только если модалка открыта через активацию маскота
+        if (!this.chatStarted) {
+            this.startChat();
+        }
+        this.addMetroInfoToChat();
+    }
+
+    hideMascotModal() {
+        this.mascotModal.classList.remove('show');
+        document.body.style.overflow = '';
+        
+        // Воспроизводим аудио с информацией о метро, если озвучка включена
+        if (this.audioEnabled) {
+            this.playMetroAudio();
+        }
+        
+        // Перезапускаем таймер бездействия
+        this.resetInactivityTimer();
+    }
+
+    addMetroInfoToChat() {
+        const metroMessage = `🐻 Московский метрополитен - это одна из самых красивых и загруженных систем метро в мире!
+
+🚇 **Интересные факты:**
+• Более 250 станций на 14 линиях
+• Протяженность более 450 км
+• Ежедневно перевозит 9+ миллионов пассажиров
+• Некоторые станции находятся на глубине до 84 метров
+• Известен уникальной архитектурой "сталинских" станций
+
+🏛️ **Самые красивые станции:**
+• Комсомольская
+• Новослободская  
+• Маяковская
+• Площадь Революции
+• Арбатская
+
+Метро Москвы - это не просто транспорт, а настоящий подземный музей! 🎨`;
+
+        this.displayMessage(metroMessage, 'bot');
+    }
+
+    async playMetroAudio() {
+        try {
+            // Создаем запрос к бэкенду для генерации аудио о метро
+            const response = await fetch('/api/chat/text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    query: "Расскажи интересные факты о Московском метрополитене, его истории, архитектуре и современных возможностях",
+                    voice: this.selectedVoice
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.audioUrl && this.audioEnabled) {
+                    await this.playAudio(data.audioUrl);
+                }
+            }
+        } catch (error) {
+            console.error('Ошибка воспроизведения аудио о метро:', error);
+        }
+    }
+
+    startChat() {
+        this.chatStarted = true;
+        const welcomeBoard = this.chatWindow.querySelector('.welcome-board');
+        if (welcomeBoard) {
+            welcomeBoard.style.display = 'none';
+        }
+        this.headerTitle.textContent = 'Чат-помощник';
+        
+        // Останавливаем таймер бездействия при начале чата
+        clearTimeout(this.inactivityTimer);
+    }
+
+    // Остальные методы остаются без изменений
+    setWelcomeTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('ru-RU', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        const dateString = now.toLocaleDateString('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+        this.welcomeTime.textContent = `${dateString}, ${timeString}`;
+    }
+
+    setupSystemThemeListener() {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            if (!localStorage.getItem('theme')) {
+                this.applyTheme('dark');
+            }
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('theme')) {
+                this.applyTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    }
+
+    applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        const themeIcon = this.themeToggle;
+        themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
     }
 
     handleVoiceChange(voiceType) {
@@ -122,17 +323,12 @@ class BoardChatApp {
         if (savedVoice) {
             this.selectedVoice = savedVoice;
             
-            // Устанавливаем соответствующий radio button
             if (savedVoice === 'female') {
                 this.voiceFemale.checked = true;
             } else {
                 this.voiceMale.checked = true;
             }
         }
-    }
-
-    setupQuickQuestions() {
-        // Автоматическая настройка уже работает через делегирование событий
     }
 
     handleSubmit() {
@@ -162,7 +358,6 @@ class BoardChatApp {
         const question = button.getAttribute('data-question');
         this.sendMessage(question);
         
-        // Анимация нажатия
         button.style.transform = 'scale(0.95)';
         setTimeout(() => {
             button.style.transform = '';
@@ -170,19 +365,14 @@ class BoardChatApp {
     }
 
     async sendMessage(message) {
-        // Очищаем поле ввода
         this.messageInput.value = '';
         this.handleInput();
         
-        // Начинаем чат, если еще не начат
         if (!this.chatStarted) {
             this.startChat();
         }
         
-        // Показываем сообщение пользователя
         this.displayMessage(message, 'user');
-        
-        // Показываем индикатор загрузки
         this.showTypingIndicator();
         
         try {
@@ -223,15 +413,6 @@ class BoardChatApp {
         }
     }
 
-    startChat() {
-        this.chatStarted = true;
-        const welcomeBoard = this.chatWindow.querySelector('.welcome-board');
-        if (welcomeBoard) {
-            welcomeBoard.style.display = 'none';
-        }
-        this.headerTitle.textContent = 'Чат-помощник';
-    }
-
     displayMessage(text, sender) {
         const messageElement = document.createElement('div');
         messageElement.className = `message-touch ${sender}-message-touch`;
@@ -267,7 +448,6 @@ class BoardChatApp {
         const messages = this.chatWindow.querySelectorAll('.message-touch');
         messages.forEach(msg => msg.remove());
         
-        // Показываем приветственный блок снова
         const welcomeBoard = this.chatWindow.querySelector('.welcome-board');
         if (welcomeBoard) {
             welcomeBoard.style.display = 'block';
@@ -276,17 +456,17 @@ class BoardChatApp {
         this.chatStarted = false;
         this.headerTitle.textContent = 'Популярные вопросы';
         this.showNotification('Чат очищен', 'success');
+        
+        // Перезапускаем таймер бездействия при очистке чата
+        this.startInactivityTimer();
     }
 
     toggleTheme() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         
-        document.documentElement.setAttribute('data-theme', newTheme);
+        this.applyTheme(newTheme);
         localStorage.setItem('theme', newTheme);
-        
-        const themeIcon = this.themeToggle;
-        themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         
         this.showNotification(newTheme === 'dark' ? 'Темная тема включена' : 'Светлая тема включена', 'success');
     }
@@ -306,9 +486,7 @@ class BoardChatApp {
 
     loadTheme() {
         const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        const themeIcon = this.themeToggle;
-        themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        this.applyTheme(savedTheme);
     }
 
     async playAudio(audioUrl) {
@@ -377,7 +555,6 @@ class BoardChatApp {
         }
     }
 
-    // Базовые функции голосового ввода
     checkSpeechSupport() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         return {

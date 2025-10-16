@@ -1,11 +1,13 @@
-/* style.css */
+/* style.css - ОБНОВЛЕННЫЙ С ТЕМНОЙ ТЕМОЙ */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 :root {
     --primary-red: #EA3749;
+    --primary-red-dark: #ff6b7a;
     --page-bg: #F9F9F9;
     --container-bg: #ffffff;
     --text-color: #333333;
+    --text-color-dark: #ffffff;
     --border-color: #EAEAEA;
     --input-bg-color: #F0F0F0;
     --mic-bg-color: #EBEBEB;
@@ -18,15 +20,34 @@
     --success-color: #4CAF50;
     --text-secondary: #666;
     --text-tertiary: #999;
+    
+    /* Новые переменные для темной темы */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --hover-color: #f5f5f5;
+    --user-msg-bg: #e1e1e1;
+    --user-msg-bg-dark: #4a4a4a;
+    --bot-msg-bg: #F0F4FF;
+    --bot-msg-bg-dark: #2a3a5a;
+    --input-border: #EAEAEA;
+    --input-border-dark: #555;
 }
 
 [data-theme="dark"] {
     --page-bg: #1a1a1a;
     --container-bg: #2d2d2d;
     --text-color: #ffffff;
-    --border-color: #444;
+    --text-secondary: #cccccc;
+    --text-tertiary: #999999;
+    --border-color: #444444;
     --input-bg-color: #3a3a3a;
-    --mic-bg-color: #444;
+    --mic-bg-color: #444444;
+    --mic-icon-color: #cccccc;
+    --mic-icon-active-color: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --hover-color: #3a3a3a;
+    --user-msg-bg: var(--user-msg-bg-dark);
+    --bot-msg-bg: var(--bot-msg-bg-dark);
+    --input-border: var(--input-border-dark);
 }
 
 * {
@@ -45,7 +66,7 @@ html, body {
     align-items: center;
     overflow: hidden;
     color: var(--text-color);
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .app-wrapper {
@@ -71,9 +92,15 @@ html, body {
     background-size: cover;
     background-repeat: repeat-y;
     animation: scroll-pattern 25s linear infinite;
+    transition: filter 0.3s ease;
 }
+
 .pattern-left { background-image: url('img/uzor-left.svg'); }
 .pattern-right { background-image: url('img/uzor-right.svg'); }
+
+[data-theme="dark"] .pattern {
+    filter: brightness(0.3) invert(0.1);
+}
 
 .chat-container {
     flex-grow: 1;
@@ -95,8 +122,14 @@ html, body {
     padding: 20px 0;
     flex-shrink: 0;
 }
+
 .logo {
     height: 65px;
+    transition: filter 0.3s ease;
+}
+
+[data-theme="dark"] .logo {
+    filter: brightness(0.8) invert(1);
 }
 
 .chat-header {
@@ -109,6 +142,11 @@ html, body {
 
 .mascot {
     height: 80px;
+    transition: filter 0.3s ease;
+}
+
+[data-theme="dark"] .mascot {
+    filter: brightness(0.9) hue-rotate(180deg);
 }
 
 .header-title-container {
@@ -118,7 +156,13 @@ html, body {
     background-color: var(--primary-red);
     border-radius: 12px;
     margin: 0 15px;
+    transition: background-color 0.3s ease;
 }
+
+[data-theme="dark"] .header-title-container {
+    background-color: var(--primary-red-dark);
+}
+
 #header-title { 
     color: white; 
     font-size: 1.2em; 
@@ -138,6 +182,7 @@ html, body {
     gap: 8px;
     font-size: 0.8em;
     color: var(--text-secondary);
+    transition: color 0.3s ease;
 }
 
 .status-dot {
@@ -158,6 +203,8 @@ html, body {
     padding: 0 25px;
     display: flex;
     flex-direction: column;
+    background-color: var(--container-bg);
+    transition: background-color 0.3s ease;
 }
 
 .welcome-board {
@@ -188,10 +235,13 @@ html, body {
 }
 
 .question-btn:hover { 
-    background-color: var(--input-bg-color);
+    background-color: var(--hover-color);
     transform: translateX(5px);
 }
-.question-btn:last-child { border-bottom: none; }
+
+.question-btn:last-child { 
+    border-bottom: none; 
+}
 
 /* Стили для сообщений чата */
 .message-touch {
@@ -232,6 +282,7 @@ html, body {
     margin: 0 8px;
     flex-shrink: 0;
     background-color: var(--input-bg-color);
+    transition: background-color 0.3s ease;
 }
 
 .user-message-touch .message-avatar-touch {
@@ -239,21 +290,26 @@ html, body {
     color: white;
 }
 
+[data-theme="dark"] .user-message-touch .message-avatar-touch {
+    background-color: var(--primary-red-dark);
+}
+
 .message-content-touch {
     background-color: var(--input-bg-color);
     border-radius: 18px;
     padding: 12px 16px;
     max-width: 100%;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transition: all 0.3s ease;
 }
 
 .user-message-touch .message-content-touch {
-    background-color: #e1e1e1;
+    background-color: var(--user-msg-bg);
     border-bottom-right-radius: 5px;
 }
 
 .bot-message-touch .message-content-touch {
-    background-color: #F0F4FF;
+    background-color: var(--bot-msg-bg);
     border-bottom-left-radius: 5px;
 }
 
@@ -278,6 +334,7 @@ html, body {
     padding: 12px 20px;
     color: var(--text-secondary);
     font-size: 0.9em;
+    transition: color 0.3s ease;
 }
 
 .typing-indicator.show {
@@ -319,6 +376,7 @@ html, body {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    transition: all 0.3s ease;
 }
 
 .voice-controls {
@@ -336,7 +394,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px var(--shadow-color);
     transition: all 0.2s ease;
     flex-shrink: 0;
 }
@@ -346,10 +404,24 @@ html, body {
     animation: pulse 1.5s ease-in-out infinite;
 }
 
+[data-theme="dark"] .mic-button.recording {
+    background-color: var(--primary-red-dark);
+}
+
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(234, 55, 73, 0.4); }
     70% { box-shadow: 0 0 0 10px rgba(234, 55, 73, 0); }
     100% { box-shadow: 0 0 0 0 rgba(234, 55, 73, 0); }
+}
+
+[data-theme="dark"] .mic-button.recording {
+    animation: pulseDark 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseDark {
+    0% { box-shadow: 0 0 0 0 rgba(255, 107, 122, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 107, 122, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 107, 122, 0); }
 }
 
 .mic-icon-path { 
@@ -361,8 +433,9 @@ html, body {
     fill: white;
 }
 
-.mic-button:active .mic-icon-path { fill: var(--mic-icon-active-color); }
-.mic-button:active { background-color: #dcdcdc; }
+.mic-button:active { 
+    background-color: var(--hover-color); 
+}
 
 .voice-settings {
     display: flex;
@@ -395,7 +468,7 @@ html, body {
 
 #message-input {
     width: 100%;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--input-border);
     padding: 16px 120px 16px 25px;
     border-radius: 50px;
     background-color: var(--input-bg-color);
@@ -408,6 +481,16 @@ html, body {
     outline: none; 
     border-color: var(--primary-red);
     box-shadow: 0 0 0 2px rgba(234, 55, 73, 0.1);
+}
+
+[data-theme="dark"] #message-input:focus {
+    border-color: var(--primary-red-dark);
+    box-shadow: 0 0 0 2px rgba(255, 107, 122, 0.2);
+}
+
+#message-input::placeholder {
+    color: var(--text-tertiary);
+    transition: color 0.3s ease;
 }
 
 .input-controls {
@@ -423,6 +506,7 @@ html, body {
 .char-counter {
     font-size: 0.8em;
     color: var(--text-tertiary);
+    transition: color 0.3s ease;
 }
 
 .send-button {
@@ -440,9 +524,17 @@ html, body {
     height: 36px;
 }
 
+[data-theme="dark"] .send-button {
+    background: var(--primary-red-dark);
+}
+
 .send-button:hover { 
     background: #d63243;
     transform: scale(1.05);
+}
+
+[data-theme="dark"] .send-button:hover {
+    background: #ff5252;
 }
 
 .send-button:disabled {
@@ -467,6 +559,7 @@ html, body {
     cursor: pointer;
     font-size: 0.9em;
     color: var(--text-secondary);
+    transition: color 0.3s ease;
 }
 
 .toggle-slider {
@@ -494,6 +587,10 @@ html, body {
     background-color: var(--primary-red);
 }
 
+[data-theme="dark"] #audio-toggle:checked + .toggle-slider {
+    background-color: var(--primary-red-dark);
+}
+
 #audio-toggle:checked + .toggle-slider:before {
     transform: translateX(20px);
 }
@@ -513,11 +610,17 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(--container-bg);
 }
 
 .control-btn:hover {
-    background-color: var(--input-bg-color);
+    background-color: var(--hover-color);
     color: var(--text-color);
+    border-color: var(--primary-red);
+}
+
+[data-theme="dark"] .control-btn:hover {
+    border-color: var(--primary-red-dark);
 }
 
 /* Оверлей записи */
@@ -544,6 +647,8 @@ html, body {
     border-radius: 20px;
     text-align: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    color: var(--text-color);
+    transition: all 0.3s ease;
 }
 
 .recording-animation {
@@ -553,6 +658,10 @@ html, body {
     background-color: var(--primary-red);
     margin: 0 auto 20px;
     animation: recordingPulse 1.5s ease-in-out infinite;
+}
+
+[data-theme="dark"] .recording-animation {
+    background-color: var(--primary-red-dark);
 }
 
 @keyframes recordingPulse {
@@ -571,7 +680,7 @@ html, body {
     color: var(--text-color);
     padding: 12px 24px;
     border-radius: 25px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 20px var(--shadow-color);
     z-index: 1001;
     transition: transform 0.3s ease;
     border: 1px solid var(--border-color);
@@ -595,3 +704,466 @@ html, body {
 .board-notification.info {
     border-left: 4px solid var(--primary-red);
 }
+
+[data-theme="dark"] .board-notification.info {
+    border-left: 4px solid var(--primary-red-dark);
+}
+
+/* Стили для скроллбара */
+.chat-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background: var(--text-tertiary);
+    border-radius: 3px;
+}
+
+.chat-box::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Для Firefox */
+.chat-box {
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-tertiary) transparent;
+}
+
+/* Анимация переключения темы */
+* {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Улучшенные стили для радиокнопок */
+.voice-option input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--text-tertiary);
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.voice-option input[type="radio"]:checked {
+    border-color: var(--primary-red);
+}
+
+[data-theme="dark"] .voice-option input[type="radio"]:checked {
+    border-color: var(--primary-red-dark);
+}
+
+.voice-option input[type="radio"]:checked::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-red);
+    border-radius: 50%;
+}
+
+[data-theme="dark"] .voice-option input[type="radio"]:checked::before {
+    background-color: var(--primary-red-dark);
+}
+/* style.css - ОБНОВЛЕННЫЙ С МАСКОТОМ */
+/* ... предыдущие стили остаются без изменений ... */
+
+/* Стили для интерактивного маскота */
+.mascot-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+}
+
+.mascot-button:hover {
+    transform: scale(1.1);
+}
+
+.mascot-button:active {
+    transform: scale(0.95);
+}
+
+.mascot-button.idle {
+    animation: mascotIdle 2s ease-in-out infinite;
+}
+
+.mascot-button.attention {
+    animation: mascotAttention 0.8s ease-in-out infinite;
+}
+
+@keyframes mascotIdle {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-5px) rotate(2deg); }
+    75% { transform: translateY(-3px) rotate(-2deg); }
+}
+
+@keyframes mascotAttention {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+.mascot-notification {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--primary-red);
+    color: white;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    animation: notificationPulse 2s infinite;
+    border: 2px solid var(--container-bg);
+}
+
+[data-theme="dark"] .mascot-notification {
+    border-color: var(--container-bg);
+}
+
+@keyframes notificationPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.mascot-notification.show {
+    display: flex;
+}
+
+/* Модальное окно маскота */
+.mascot-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1003;
+    backdrop-filter: blur(5px);
+}
+
+.mascot-modal.show {
+    display: flex;
+    animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.mascot-modal-content {
+    background-color: var(--container-bg);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    animation: contentSlideUp 0.4s ease-out;
+}
+
+@keyframes contentSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mascot-modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary-red), #ff6b7a);
+    color: white;
+}
+
+.mascot-modal-header h2 {
+    margin: 0;
+    font-size: 1.4em;
+    font-weight: 600;
+}
+
+.close-mascot-modal {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2em;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.close-mascot-modal:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.mascot-modal-body {
+    padding: 25px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.metro-info {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.metro-fact {
+    background-color: var(--input-bg-color);
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-red);
+}
+
+.metro-fact h3 {
+    margin: 0 0 12px 0;
+    color: var(--primary-red);
+    font-size: 1.1em;
+}
+
+[data-theme="dark"] .metro-fact h3 {
+    color: var(--primary-red-dark);
+}
+
+.metro-fact p {
+    margin: 0 0 15px 0;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+.metro-fact ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--text-color);
+}
+
+.metro-fact li {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.metro-image-placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 120px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.metro-image-placeholder::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.image-caption {
+    color: white;
+    font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    z-index: 1;
+    text-align: center;
+    padding: 0 15px;
+}
+
+.mascot-modal-footer {
+    padding: 20px 25px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    background-color: var(--input-bg-color);
+}
+
+.mascot-action-btn {
+    background-color: var(--primary-red);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .mascot-action-btn {
+    background-color: var(--primary-red-dark);
+}
+
+.mascot-action-btn:hover {
+    background-color: #d63243;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(234, 55, 73, 0.3);
+}
+
+[data-theme="dark"] .mascot-action-btn:hover {
+    background-color: #ff5252;
+}
+
+/* Адаптивность для модального окна */
+@media (max-width: 768px) {
+    .mascot-modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .mascot-modal-header {
+        padding: 15px 20px;
+    }
+    
+    .mascot-modal-body {
+        padding: 20px;
+    }
+    
+    .mascot-modal-header h2 {
+        font-size: 1.2em;
+    }
+    
+    .metro-fact {
+        padding: 15px;
+    }
+}
+
+/* Стили для скроллбара в модальном окне */
+.mascot-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mascot-modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.mascot-modal-body::-webkit-scrollbar-thumb {
+    background: var(--text-tertiary);
+    border-radius: 3px;
+}
+
+.mascot-modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+/* style.css - ДОБАВИМ НЕДОСТАЮЩИЕ СТИЛИ ДЛЯ КНОПКИ МАСКОТА */
+.mascot-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mascot-button:hover {
+    transform: scale(1.1);
+}
+
+.mascot-button:active {
+    transform: scale(0.95);
+}
+
+.mascot-button.idle {
+    animation: mascotIdle 2s ease-in-out infinite;
+}
+
+.mascot-button.attention {
+    animation: mascotAttention 0.8s ease-in-out infinite;
+}
+
+@keyframes mascotIdle {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-5px) rotate(2deg); }
+    75% { transform: translateY(-3px) rotate(-2deg); }
+}
+
+@keyframes mascotAttention {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+.mascot-notification {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--primary-red);
+    color: white;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    animation: notificationPulse 2s infinite;
+    border: 2px solid var(--container-bg);
+}
+
+[data-theme="dark"] .mascot-notification {
+    border-color: var(--container-bg);
+}
+
+@keyframes notificationPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.mascot-notification.show {
+    display: flex;
+}
+
+/* Остальные стили модального окна остаются без изменений */
