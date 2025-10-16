@@ -12,6 +12,7 @@ import re
 import threading
 import time
 
+#Я выйду он зайдет. Ладно, давай 🗣️ 🔥
 # Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
