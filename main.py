@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app = Flask(__name__)
-CORS(app)  # Включаем CORS для всех路由
+CORS(app)  # Включаем CORS для всех
 
 # Создаем папки если их нет
 for folder in ['audio', 'static']:
@@ -34,11 +34,11 @@ for folder in ['audio', 'static']:
 class ChatBot:
     def __init__(self):
         # Учетные данные для GigaChat
-        self.gigachat_credentials = "MDE5OWU2ZWQtNzZhYy03NDRiLWI1MzAtMGMzYmMxNDdhZGM0OjNlZDZkMjM3LWM0NDQtNGRjYS1hM2JjLTAwMTA3Y2U1MzQzNg=="
+        self.gigachat_credentials = "ВАШ_КЛЮЧ_ДОСТУПА_К_ГИГАЧАТ"
         
         # Учетные данные для SaluteSpeech
-        self.speech_client_id = "0199e720-1cc1-71e5-8fa6-d7864145d056"
-        self.speech_client_secret = "7390843f-6963-4c0e-98f8-3e80d5b80677"
+        self.speech_client_id = "ID_КЛИЕНТА"
+        self.speech_client_secret = "СЕКРЕТ_КЛИЕНТА"
         
         # Кэш токенов
         self.gigachat_token = None
@@ -137,6 +137,7 @@ class ChatBot:
             system_prompt = """Ты - помощник в Корпоративном Университете Транспортного Комплекса Москвы под именем Метроша. Отвечай на вопросы студентов и абитуриентов вежливо, с учетом русской грамматики и информативно. 
             Если спросят про метро без конкретизации вопроса- расскажи про Московский Метрополитен, о его важности в инфраструктуре Москвы 
             Если спросят про тебя - представься и расскажи о себе  
+            Ограничься знаниями о городском транспорте, а также выдавай информацию по Корпоративному Университету Транспортного Комплекса Москвы.
             Будь кратким, но содержательным. Если не знаешь точного ответа, предложи обратиться в деканат или дай общую информацию."""
 
             payload = {
