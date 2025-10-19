@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app = Flask(__name__)
-CORS(app)  # Включаем CORS для всех路由
+CORS(app)  # Включаем CORS для всех
 
 # Создаем папки если их нет
 for folder in ['audio', 'static']:
