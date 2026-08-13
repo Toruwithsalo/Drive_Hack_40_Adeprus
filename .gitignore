@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+*.tar.gz
+
+# Виртуальное окружение
+venv/
+env/
+ENV/
+.venv
+
+# Переменные окружения (секреты)
+.env
+.env.local
+.env.*.local
+
+# Логи
+*.log
+logs/
+
+# Аудиофайлы (временные)
+audio/*.wav
+audio/*.mp3
+audio/*.ogg
+!audio/.gitkeep   # опционально, если хотите сохранить пустую папку
+
+# IDE и редакторы
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Файлы отладки
+*.pid
+*.lock
+
+# Отчёты тестов
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Файлы базы данных (если есть)
+*.db
+*.sqlite3
+
+# Временные файлы
+tmp/
+temp/
+
+# Системные
+*.bak
+*.orig
+*.tmp
+
+# Файлы документации (если не хотите)
+# docs/_build/
+
+# Статика (если собирается отдельно, но у нас уже есть статика)
+# static/ - обычно коммитится, так что не исключаем
+
+# Примеры и тестовые данные
+examples/
+tests/fixtures/
